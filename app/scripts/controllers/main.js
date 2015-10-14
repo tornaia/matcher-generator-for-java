@@ -96,11 +96,10 @@ angular.module('matcherGeneratorForJavaApp')
 										
 										var matcherClass = undefined;
 										var isPrimitiveType = bodyDeclaration.returnType2.primitiveTypeCode != undefined;
+										var isParametrized = bodyDeclaration.returnType2.node == 'ParameterizedType';
 										if (isPrimitiveType) {
 											matcherClass = convertPrimitiveTypeToBoxedType(bodyDeclaration.returnType2.primitiveTypeCode);
-										}
-										var isParametrized = bodyDeclaration.returnType2.node == 'ParameterizedType';
-										if (isParametrized) {
+										} else if (isParametrized) {
 											matcherClass = bodyDeclaration.returnType2.type.name.identifier + '<' + bodyDeclaration.returnType2.typeArguments[0].name.identifier + '>';
 										} else {
 											matcherClass = bodyDeclaration.returnType2.name.identifier;
@@ -139,11 +138,10 @@ angular.module('matcherGeneratorForJavaApp')
 										
 										var matcherClass = undefined;
 										var isPrimitiveType = bodyDeclaration.returnType2.primitiveTypeCode != undefined;
+										var isParametrized = bodyDeclaration.returnType2.node == 'ParameterizedType';
 										if (isPrimitiveType) {
 											matcherClass = convertPrimitiveTypeToBoxedType(bodyDeclaration.returnType2.primitiveTypeCode);
-										}
-										var isParametrized = bodyDeclaration.returnType2.node == 'ParameterizedType';
-										if (isParametrized) {
+										} else if (isParametrized) {
 											matcherClass = bodyDeclaration.returnType2.type.name.identifier + '<' + bodyDeclaration.returnType2.typeArguments[0].name.identifier + '>';
 										} else {
 											matcherClass = bodyDeclaration.returnType2.name.identifier;
