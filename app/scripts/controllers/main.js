@@ -98,6 +98,10 @@ angular.module('matcherGeneratorForJavaApp')
 										var isPrimitiveType = bodyDeclaration.returnType2.primitiveTypeCode != undefined;
 										if (isPrimitiveType) {
 											matcherClass = convertPrimitiveTypeToBoxedType(bodyDeclaration.returnType2.primitiveTypeCode);
+										}
+										var isParametrized = bodyDeclaration.returnType2.node == 'ParameterizedType';
+										if (isParametrized) {
+											matcherClass = bodyDeclaration.returnType2.type.name.identifier + '<' + bodyDeclaration.returnType2.typeArguments[0].name.identifier + '>';
 										} else {
 											matcherClass = bodyDeclaration.returnType2.name.identifier;
 										}
@@ -137,6 +141,10 @@ angular.module('matcherGeneratorForJavaApp')
 										var isPrimitiveType = bodyDeclaration.returnType2.primitiveTypeCode != undefined;
 										if (isPrimitiveType) {
 											matcherClass = convertPrimitiveTypeToBoxedType(bodyDeclaration.returnType2.primitiveTypeCode);
+										}
+										var isParametrized = bodyDeclaration.returnType2.node == 'ParameterizedType';
+										if (isParametrized) {
+											matcherClass = bodyDeclaration.returnType2.type.name.identifier + '<' + bodyDeclaration.returnType2.typeArguments[0].name.identifier + '>';
 										} else {
 											matcherClass = bodyDeclaration.returnType2.name.identifier;
 										}
