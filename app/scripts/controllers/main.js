@@ -45,14 +45,14 @@ angular.module('matcherGeneratorForJavaApp')
 												if (property === 'identifier') {
 													packages.push(obj[property]);
 												}
-												if (typeof obj[property] == "object") {
+												if (typeof obj[property] === "object") {
 													calculate(obj[property]);
 												}
 											}
 										}
 									}
 									calculate(classAsJson['package']);
-									return packages.length == 0 ? '' : 'package ' + packages.join('.') + ';';
+									return packages.length === 0 ? '' : 'package ' + packages.join('.') + ';';
 								})();
 					
 		/*
@@ -83,28 +83,44 @@ angular.module('matcherGeneratorForJavaApp')
 										var node = bodyDeclaration.node;
 										
 										var isMethodDeclaration = node === 'MethodDeclaration';
-										if (!isMethodDeclaration) {
-											continue;
-										}
-										
-										var methodIdentifier = bodyDeclaration.name.identifier;
-										var isGetterMethod = methodIdentifier.indexOf('get') != -1;
-										if (!isGetterMethod) {
-											continue;
-										}
-										var variableName = lowerCaseFirstChar(methodIdentifier.substr(3));
+										var isFieldDeclaration = node === 'FieldDeclaration';
 										
 										var matcherClass = undefined;
-										var isPrimitiveType = bodyDeclaration.returnType2.primitiveTypeCode != undefined;
-										var isParametrized = bodyDeclaration.returnType2.node == 'ParameterizedType';
-										if (isPrimitiveType) {
-											matcherClass = convertPrimitiveTypeToBoxedType(bodyDeclaration.returnType2.primitiveTypeCode);
-										} else if (isParametrized) {
-											matcherClass = bodyDeclaration.returnType2.type.name.identifier + '<' + bodyDeclaration.returnType2.typeArguments[0].name.identifier + '>';
-										} else {
-											matcherClass = bodyDeclaration.returnType2.name.identifier;
+										var variableName = undefined;
+										if (isMethodDeclaration) {
+											var methodIdentifier = bodyDeclaration.name.identifier;
+											var isGetterMethod = methodIdentifier.indexOf('get') != -1;
+											if (!isGetterMethod) {
+												continue;
+											}
+											variableName = lowerCaseFirstChar(methodIdentifier.substr(3));
+											
+											var isPrimitiveType = bodyDeclaration.returnType2.primitiveTypeCode != undefined;
+											var isParametrized = bodyDeclaration.returnType2.node === 'ParameterizedType';
+											if (isPrimitiveType) {
+												matcherClass = convertPrimitiveTypeToBoxedType(bodyDeclaration.returnType2.primitiveTypeCode);
+											} else if (isParametrized) {
+												matcherClass = bodyDeclaration.returnType2.type.name.identifier + '<' + bodyDeclaration.returnType2.typeArguments[0].name.identifier + '>';
+											} else {
+												matcherClass = bodyDeclaration.returnType2.name.identifier;
+											}
+										} else if (isFieldDeclaration) {
+											var isPublicField = bodyDeclaration.modifiers[0].keyword === 'public';
+											if (!isPublicField) {
+												continue;
+											}
+											variableName = bodyDeclaration.fragments[0].name.identifier;
+											var isPrimitiveType = bodyDeclaration.type.node === 'PrimitiveType';
+											var isParametrized = bodyDeclaration.type.node === 'ParameterizedType';
+											if (isPrimitiveType) {
+												matcherClass = convertPrimitiveTypeToBoxedType(bodyDeclaration.type.primitiveTypeCode);
+											} else if (isParametrized) {
+												matcherClass = bodyDeclaration.type.type.name.identifier + '<' + bodyDeclaration.type.typeArguments[0].name.identifier + '>';
+											} else {
+												matcherClass = bodyDeclaration.type.name.identifier;
+											}
 										}
-										bodyDeclaration.returnType2.primitiveTypeCode
+
 										fields += TAB + 'private Matcher<' + matcherClass + '> ' + variableName + ' = new IsAnything<>();\n\n'
 									}
 									
@@ -124,27 +140,49 @@ angular.module('matcherGeneratorForJavaApp')
 										var node = bodyDeclaration.node;
 										
 										var isMethodDeclaration = node === 'MethodDeclaration';
-										if (!isMethodDeclaration) {
-											continue;
-										}
+										var isFieldDeclaration = node === 'FieldDeclaration';
 										
-										var methodIdentifier = bodyDeclaration.name.identifier;
-										var isGetterMethod = methodIdentifier.indexOf('get') != -1;
-										if (!isGetterMethod) {
-											continue;
-										}
 										var builderReturnType = classAsJson.types[0].name.identifier;
-										var variableName = lowerCaseFirstChar(methodIdentifier.substr(3));
-										
+										var variableName = undefined;
 										var matcherClass = undefined;
-										var isPrimitiveType = bodyDeclaration.returnType2.primitiveTypeCode != undefined;
-										var isParametrized = bodyDeclaration.returnType2.node == 'ParameterizedType';
-										if (isPrimitiveType) {
-											matcherClass = convertPrimitiveTypeToBoxedType(bodyDeclaration.returnType2.primitiveTypeCode);
-										} else if (isParametrized) {
-											matcherClass = bodyDeclaration.returnType2.type.name.identifier + '<' + bodyDeclaration.returnType2.typeArguments[0].name.identifier + '>';
+										
+										
+										if (isMethodDeclaration) {
+											var methodIdentifier = bodyDeclaration.name.identifier;
+											var isGetterMethod = methodIdentifier.indexOf('get') != -1;
+											if (!isGetterMethod) {
+												continue;
+											}
+											
+											variableName = lowerCaseFirstChar(methodIdentifier.substr(3));
+											
+											var isPrimitiveType = bodyDeclaration.returnType2.primitiveTypeCode != undefined;
+											var isParametrized = bodyDeclaration.returnType2.node === 'ParameterizedType';
+											if (isPrimitiveType) {
+												matcherClass = convertPrimitiveTypeToBoxedType(bodyDeclaration.returnType2.primitiveTypeCode);
+											} else if (isParametrized) {
+												matcherClass = bodyDeclaration.returnType2.type.name.identifier + '<' + bodyDeclaration.returnType2.typeArguments[0].name.identifier + '>';
+											} else {
+												matcherClass = bodyDeclaration.returnType2.name.identifier;
+											}
+										} else if (isFieldDeclaration) {
+											var isPublicField = bodyDeclaration.modifiers[0].keyword === 'public';
+											if (!isPublicField) {
+												continue;
+											}
+											
+											variableName = bodyDeclaration.fragments[0].name.identifier;
+											var isPrimitiveType = bodyDeclaration.type.node === 'PrimitiveType';
+											var isParametrized = bodyDeclaration.type.node === 'ParameterizedType';
+											if (isPrimitiveType) {
+												matcherClass = convertPrimitiveTypeToBoxedType(bodyDeclaration.type.primitiveTypeCode);
+											} else if (isParametrized) {
+												matcherClass = bodyDeclaration.type.type.name.identifier + '<' + bodyDeclaration.type.typeArguments[0].name.identifier + '>';
+											} else {
+												matcherClass = bodyDeclaration.type.name.identifier;
+											}
 										} else {
-											matcherClass = bodyDeclaration.returnType2.name.identifier;
+											continue;
 										}
 										
 										fields += TAB + 'public ' + builderReturnType + 'Matcher ' + variableName + '(' + matcherClass + ' ' + variableName + ') {\n' + TAB + TAB + 'this.' + variableName + ' = is(' + variableName + ');\n' + TAB + TAB + 'return this;\n' + TAB + '}\n\n';
@@ -173,20 +211,35 @@ angular.module('matcherGeneratorForJavaApp')
 										var node = bodyDeclaration.node;
 										
 										var isMethodDeclaration = node === 'MethodDeclaration';
-										if (!isMethodDeclaration) {
+										var isFieldDeclaration = node === 'FieldDeclaration';
+										
+										var variableName = undefined;
+										var methodIdentifier = undefined;
+										
+										if (isMethodDeclaration) {
+											methodIdentifier = bodyDeclaration.name.identifier;
+											var isGetterMethod = methodIdentifier.indexOf('get') != -1;
+											if (!isGetterMethod) {
+												continue;
+											}
+											variableName = lowerCaseFirstChar(methodIdentifier.substr(3));
+											methodIdentifier = bodyDeclaration.name.identifier + '()';
+										} else if (isFieldDeclaration) {
+											var isPublicField = bodyDeclaration.modifiers[0].keyword === 'public';
+											if (!isPublicField) {
+												continue;
+											}
+											
+											methodIdentifier = variableName = bodyDeclaration.fragments[0].name.identifier;
+										} else {
 											continue;
 										}
 										
-										var methodIdentifier = bodyDeclaration.name.identifier;
-										var isGetterMethod = methodIdentifier.indexOf('get') != -1;
-										if (!isGetterMethod) {
-											continue;
-										}
-										var variableName = lowerCaseFirstChar(methodIdentifier.substr(3));
+										
 										if (matchesSafelyBody.length !== 0) {
 											matchesSafelyBody += ' &&\n' + TAB + TAB;
 										}
-										matchesSafelyBody += 'matches(' + variableName + ', item.' + methodIdentifier + '(), "' + variableName + ' erteke: ", mismatchDescription)';
+										matchesSafelyBody += 'matches(' + variableName + ', item.' + methodIdentifier + ', "' + variableName + ' erteke: ", mismatchDescription)';
 									}
 									
 									var matchesSafelyPostFix = ';\n' + TAB + '}';
@@ -214,16 +267,24 @@ angular.module('matcherGeneratorForJavaApp')
 										var node = bodyDeclaration.node;
 										
 										var isMethodDeclaration = node === 'MethodDeclaration';
-										if (!isMethodDeclaration) {
+										var isFieldDeclaration = node === 'FieldDeclaration';
+										
+										var variableName = undefined;
+										
+										if (isMethodDeclaration) {
+											var methodIdentifier = bodyDeclaration.name.identifier;
+											var isGetterMethod = methodIdentifier.indexOf('get') != -1;
+											if (!isGetterMethod) {
+												continue;
+											}
+											variableName = lowerCaseFirstChar(methodIdentifier.substr(3));
+										} else if (isFieldDeclaration) {
+											variableName = bodyDeclaration.fragments[0].name.identifier;
+										} else {
 											continue;
 										}
 										
-										var methodIdentifier = bodyDeclaration.name.identifier;
-										var isGetterMethod = methodIdentifier.indexOf('get') != -1;
-										if (!isGetterMethod) {
-											continue;
-										}
-										var variableName = lowerCaseFirstChar(methodIdentifier.substr(3));
+										
 										if (describeToBody !== '') {
 											describeToBody += '\n';
 										}
