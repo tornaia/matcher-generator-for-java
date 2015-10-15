@@ -61,7 +61,7 @@ angular.module('matcherGeneratorForJavaApp')
 
 			import hu.ipsystems.matcher.KipTypeSafeDiagnosingMatcher;
 		*/					
-		var sectionImports = 'import static org.hamcrest.Matchers.is;\n\nimport org.hamcrest.Description;\nimport org.hamcrest.Matcher;\nimport org.hamcrest.core.IsAnything;\n\nimport hu.ipsystems.matcher.KipTypeSafeDiagnosingMatcher;';
+		var sectionImports = 'import static org.hamcrest.Matchers.contains;\nimport static org.hamcrest.Matchers.is;\n\nimport org.hamcrest.Description;\nimport org.hamcrest.Matcher;\nimport org.hamcrest.core.IsAnything;\n\nimport hu.ipsystems.matcher.KipTypeSafeDiagnosingMatcher;';
 					
 		/*
 			public class HelloWorldMatcher extends KipTypeSafeDiagnosingMatcher<HelloWorld> {
@@ -111,11 +111,16 @@ angular.module('matcherGeneratorForJavaApp')
 											}
 											variableName = bodyDeclaration.fragments[0].name.identifier;
 											var isPrimitiveType = bodyDeclaration.type.node === 'PrimitiveType';
-											var isParametrized = bodyDeclaration.type.node === 'ParameterizedType';
+											var isParameterized = bodyDeclaration.type.node === 'ParameterizedType';
 											if (isPrimitiveType) {
 												matcherClass = convertPrimitiveTypeToBoxedType(bodyDeclaration.type.primitiveTypeCode);
-											} else if (isParametrized) {
-												matcherClass = bodyDeclaration.type.type.name.identifier + '<' + bodyDeclaration.type.typeArguments[0].name.identifier + '>';
+											} else if (isParameterized) {
+												var isList = bodyDeclaration.type.type.name.identifier === 'List';
+												if (isList) {
+													matcherClass = 'Iterable<? extends ' + bodyDeclaration.type.typeArguments[0].name.identifier + '>';
+												} else {
+													matcherClass = bodyDeclaration.type.type.name.identifier + '<' + bodyDeclaration.type.typeArguments[0].name.identifier + '>';
+												}
 											} else {
 												matcherClass = bodyDeclaration.type.name.identifier;
 											}
@@ -145,10 +150,12 @@ angular.module('matcherGeneratorForJavaApp')
 										var builderReturnType = classAsJson.types[0].name.identifier;
 										var variableName = undefined;
 										var matcherClass = undefined;
+										var matcherMethod = 'is';
 										
 										
 										if (isMethodDeclaration) {
 											var methodIdentifier = bodyDeclaration.name.identifier;
+											
 											var isGetterMethod = methodIdentifier.indexOf('get') != -1;
 											if (!isGetterMethod) {
 												continue;
@@ -173,11 +180,18 @@ angular.module('matcherGeneratorForJavaApp')
 											
 											variableName = bodyDeclaration.fragments[0].name.identifier;
 											var isPrimitiveType = bodyDeclaration.type.node === 'PrimitiveType';
-											var isParametrized = bodyDeclaration.type.node === 'ParameterizedType';
+											var isParameterized = bodyDeclaration.type.node === 'ParameterizedType';
 											if (isPrimitiveType) {
 												matcherClass = convertPrimitiveTypeToBoxedType(bodyDeclaration.type.primitiveTypeCode);
-											} else if (isParametrized) {
-												matcherClass = bodyDeclaration.type.type.name.identifier + '<' + bodyDeclaration.type.typeArguments[0].name.identifier + '>';
+											} else if (isParameterized) {
+												var isList = bodyDeclaration.type.type.name.identifier === 'List';
+												if (isList) {
+													matcherClass = 'Matcher<' + bodyDeclaration.type.typeArguments[0].name.identifier + '>... ';
+													matcherMethod = 'contains';
+												} else {
+													matcherClass = bodyDeclaration.type.type.name.identifier + '<' + bodyDeclaration.type.typeArguments[0].name.identifier + '>';
+												}
+												
 											} else {
 												matcherClass = bodyDeclaration.type.name.identifier;
 											}
@@ -185,7 +199,7 @@ angular.module('matcherGeneratorForJavaApp')
 											continue;
 										}
 										
-										fields += TAB + 'public ' + builderReturnType + 'Matcher ' + variableName + '(' + matcherClass + ' ' + variableName + ') {\n' + TAB + TAB + 'this.' + variableName + ' = is(' + variableName + ');\n' + TAB + TAB + 'return this;\n' + TAB + '}\n\n';
+										fields += TAB + 'public ' + builderReturnType + 'Matcher ' + variableName + '(' + matcherClass + ' ' + variableName + ') {\n' + TAB + TAB + 'this.' + variableName + ' = ' + matcherMethod + '(' + variableName + ');\n' + TAB + TAB + 'return this;\n' + TAB + '}\n\n';
 									}
 									
 									return fields;
