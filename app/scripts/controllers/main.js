@@ -14,14 +14,22 @@ angular.module('matcherGeneratorForJavaApp')
   
 	$scope.sourceText = 'package js.java.parser;\n\npublic class HelloWorld {\n\n\tprivate long oneProperty;\n\n\tprivate Integer twoProperty;\n\n\tpublic long getOneProperty() {\n\t\treturn oneProperty;\n\t}\n\n\tpublic Integer getTwoProperty() {\n\t\treturn twoProperty;\n\t}\n\n\tpublic void setOneProperty(long oneProperty) {\n\t\tthis.oneProperty = oneProperty;\n\t}\n}';
 
-    $scope.convert = function() {
+	$scope.convert = function() {
+		try {
+			$scope.convertFunction();
+		} catch (error) {
+			$scope.resultText = 'Error... Please check the source! Maybe its a bug? Then please notify me! :)';
+		}
+	}
+	
+    $scope.convertFunction = function() {
 		function upperCaseFirstChar(input) {
 			return input.substring(0,1).toUpperCase()+input.substring(1);
-		};
+		}
 		
 		function lowerCaseFirstChar(input) {
 			return input.substring(0,1).toLowerCase()+input.substring(1);
-		};
+		}
 		
 		function convertPrimitiveTypeToBoxedType(type) {
 			if (type === 'int') {
@@ -85,17 +93,17 @@ angular.module('matcherGeneratorForJavaApp')
 										var isMethodDeclaration = node === 'MethodDeclaration';
 										var isFieldDeclaration = node === 'FieldDeclaration';
 										
-										var matcherClass = undefined;
-										var variableName = undefined;
+										var matcherClass;
+										var variableName;
 										if (isMethodDeclaration) {
 											var methodIdentifier = bodyDeclaration.name.identifier;
-											var isGetterMethod = methodIdentifier.indexOf('get') != -1;
+											var isGetterMethod = methodIdentifier.indexOf('get') !== -1;
 											if (!isGetterMethod) {
 												continue;
 											}
 											variableName = lowerCaseFirstChar(methodIdentifier.substr(3));
 											
-											var isPrimitiveType = bodyDeclaration.returnType2.primitiveTypeCode != undefined;
+											var isPrimitiveType = bodyDeclaration.returnType2.primitiveTypeCode !== undefined;
 											var isParametrized = bodyDeclaration.returnType2.node === 'ParameterizedType';
 											if (isPrimitiveType) {
 												matcherClass = convertPrimitiveTypeToBoxedType(bodyDeclaration.returnType2.primitiveTypeCode);
@@ -126,7 +134,7 @@ angular.module('matcherGeneratorForJavaApp')
 											}
 										}
 
-										fields += TAB + 'private Matcher<' + matcherClass + '> ' + variableName + ' = new IsAnything<>();\n\n'
+										fields += TAB + 'private Matcher<' + matcherClass + '> ' + variableName + ' = new IsAnything<>();\n\n';
 									}
 									
 									return fields;
@@ -148,22 +156,22 @@ angular.module('matcherGeneratorForJavaApp')
 										var isFieldDeclaration = node === 'FieldDeclaration';
 										
 										var builderReturnType = classAsJson.types[0].name.identifier;
-										var variableName = undefined;
-										var matcherClass = undefined;
+										var variableName;
+										var matcherClass;
 										var matcherMethod = 'is';
 										
 										
 										if (isMethodDeclaration) {
 											var methodIdentifier = bodyDeclaration.name.identifier;
 											
-											var isGetterMethod = methodIdentifier.indexOf('get') != -1;
+											var isGetterMethod = methodIdentifier.indexOf('get') !== -1;
 											if (!isGetterMethod) {
 												continue;
 											}
 											
 											variableName = lowerCaseFirstChar(methodIdentifier.substr(3));
 											
-											var isPrimitiveType = bodyDeclaration.returnType2.primitiveTypeCode != undefined;
+											var isPrimitiveType = bodyDeclaration.returnType2.primitiveTypeCode !== undefined;
 											var isParametrized = bodyDeclaration.returnType2.node === 'ParameterizedType';
 											if (isPrimitiveType) {
 												matcherClass = convertPrimitiveTypeToBoxedType(bodyDeclaration.returnType2.primitiveTypeCode);
@@ -227,12 +235,12 @@ angular.module('matcherGeneratorForJavaApp')
 										var isMethodDeclaration = node === 'MethodDeclaration';
 										var isFieldDeclaration = node === 'FieldDeclaration';
 										
-										var variableName = undefined;
-										var methodIdentifier = undefined;
+										var variableName;
+										var methodIdentifier;
 										
 										if (isMethodDeclaration) {
 											methodIdentifier = bodyDeclaration.name.identifier;
-											var isGetterMethod = methodIdentifier.indexOf('get') != -1;
+											var isGetterMethod = methodIdentifier.indexOf('get') !== -1;
 											if (!isGetterMethod) {
 												continue;
 											}
@@ -283,11 +291,11 @@ angular.module('matcherGeneratorForJavaApp')
 										var isMethodDeclaration = node === 'MethodDeclaration';
 										var isFieldDeclaration = node === 'FieldDeclaration';
 										
-										var variableName = undefined;
+										var variableName;
 										
 										if (isMethodDeclaration) {
 											var methodIdentifier = bodyDeclaration.name.identifier;
-											var isGetterMethod = methodIdentifier.indexOf('get') != -1;
+											var isGetterMethod = methodIdentifier.indexOf('get') !== -1;
 											if (!isGetterMethod) {
 												continue;
 											}
@@ -314,5 +322,5 @@ angular.module('matcherGeneratorForJavaApp')
 								})();
 		
 		$scope.resultText = sectionPackage + '\n\n' + sectionImports + '\n\n' + sectionClassSignatureOpen + '\n\n' + sectionFields + sectionBuilderMethods + sectionMatchesSafely + '\n\n' + sectionDescribeTo +  '\n' + sectionClassSignatureClose;
-	}
+	};
   }]);
