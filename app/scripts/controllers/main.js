@@ -12,7 +12,7 @@ angular.module('matcherGeneratorForJavaApp')
 
 	var TAB = '\t';
   
-	$scope.sourceText = 'package js.java.parser;\n\npublic class HelloWorld {\n\n\tprivate long oneProperty;\n\n\tprivate Integer twoProperty;\n\n\tpublic long getOneProperty() {\n\t\treturn oneProperty;\n\t}\n\n\tpublic Integer getTwoProperty() {\n\t\treturn twoProperty;\n\t}\n\n\tpublic void setOneProperty(long oneProperty) {\n\t\tthis.oneProperty = oneProperty;\n\t}\n}';
+	$scope.sourceText = 'package whatever.pack.age;\n\npublic class HelloWorld {\n\n\tpublic char publicPrimitive;\n\n\tpublic Integer publicBoxedPrimitive;\n\n\tpublic List<String> publicList;\n\n\tpublic long getWhateverLong() {\n\t\treturn 1L;\n\t}\n}';
 
 	$scope.convert = function() {
 		try {
