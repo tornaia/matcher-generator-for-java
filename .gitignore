@@ -2,3 +2,5 @@
 /.tmp
 /.sass-cache
 /bower_components
+/.settings/
+/.project
