@@ -18,7 +18,7 @@ angular.module('matcherGeneratorForJavaApp')
 		try {
 			$scope.convertFunction();
 		} catch (error) {
-			$scope.resultText = 'Error... Please check the source! Maybe its a bug? Then please notify me! :)';
+			$scope.resultText = 'Error! Please check the source! Maybe its a bug? Then please notify me! :)';
 		}
 	}
 	
