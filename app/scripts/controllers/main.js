@@ -12,7 +12,7 @@ angular.module('matcherGeneratorForJavaApp')
 
 	var TAB = '\t';
   
-	$scope.sourceText = 'package whatever.pack.age;\n\npublic class HelloWorld {\n\n\tpublic char publicPrimitive;\n\n\tpublic Integer publicBoxedPrimitive;\n\n\tpublic List<String> publicList;\n\n\tpublic long getWhateverLong() {\n\t\treturn 1L;\n\t}\n}';
+	$scope.sourceText = 'package whatever.pack.age;\n\npublic class HelloWorld {\n\n\tpublic char publicPrimitive;\n\n\tpublic Integer publicBoxedPrimitive;\n\n\tpublic List<String> publicList;\n\n\tpublic long getWhateverLong() {\n\t\treturn 1L;\n\t}\n\n\tpublic boolean isWhateverBoolean() {\n\t\treturn true;\n\t}\n}';
 
 	$scope.convert = function() {
 		try {
@@ -97,11 +97,14 @@ angular.module('matcherGeneratorForJavaApp')
 										var variableName;
 										if (isMethodDeclaration) {
 											var methodIdentifier = bodyDeclaration.name.identifier;
-											var isGetterMethod = methodIdentifier.indexOf('get') !== -1;
+											
+											var isGetterMethod = methodIdentifier.indexOf('get') !== -1 || methodIdentifier.indexOf('is') !== -1;
 											if (!isGetterMethod) {
 												continue;
 											}
-											variableName = lowerCaseFirstChar(methodIdentifier.substr(3));
+
+											var getterPrefixLength = methodIdentifier.indexOf('get') !== -1 ? 3 : 2;
+											variableName = lowerCaseFirstChar(methodIdentifier.substr(getterPrefixLength));
 											
 											var isPrimitiveType = bodyDeclaration.returnType2.primitiveTypeCode !== undefined;
 											var isParametrized = bodyDeclaration.returnType2.node === 'ParameterizedType';
@@ -164,12 +167,13 @@ angular.module('matcherGeneratorForJavaApp')
 										if (isMethodDeclaration) {
 											var methodIdentifier = bodyDeclaration.name.identifier;
 											
-											var isGetterMethod = methodIdentifier.indexOf('get') !== -1;
+											var isGetterMethod = methodIdentifier.indexOf('get') !== -1 || methodIdentifier.indexOf('is') !== -1;
 											if (!isGetterMethod) {
 												continue;
 											}
-											
-											variableName = lowerCaseFirstChar(methodIdentifier.substr(3));
+
+											var getterPrefixLength = methodIdentifier.indexOf('get') !== -1 ? 3 : 2;
+											variableName = lowerCaseFirstChar(methodIdentifier.substr(getterPrefixLength));
 											
 											var isPrimitiveType = bodyDeclaration.returnType2.primitiveTypeCode !== undefined;
 											var isParametrized = bodyDeclaration.returnType2.node === 'ParameterizedType';
@@ -240,11 +244,15 @@ angular.module('matcherGeneratorForJavaApp')
 										
 										if (isMethodDeclaration) {
 											methodIdentifier = bodyDeclaration.name.identifier;
-											var isGetterMethod = methodIdentifier.indexOf('get') !== -1;
+											
+											var isGetterMethod = methodIdentifier.indexOf('get') !== -1 || methodIdentifier.indexOf('is') !== -1;
 											if (!isGetterMethod) {
 												continue;
 											}
-											variableName = lowerCaseFirstChar(methodIdentifier.substr(3));
+
+											var getterPrefixLength = methodIdentifier.indexOf('get') !== -1 ? 3 : 2;
+											variableName = lowerCaseFirstChar(methodIdentifier.substr(getterPrefixLength));
+											
 											methodIdentifier = bodyDeclaration.name.identifier + '()';
 										} else if (isFieldDeclaration) {
 											var isPublicField = bodyDeclaration.modifiers[0].keyword === 'public';
@@ -295,11 +303,15 @@ angular.module('matcherGeneratorForJavaApp')
 										
 										if (isMethodDeclaration) {
 											var methodIdentifier = bodyDeclaration.name.identifier;
-											var isGetterMethod = methodIdentifier.indexOf('get') !== -1;
+											
+											var isGetterMethod = methodIdentifier.indexOf('get') !== -1 || methodIdentifier.indexOf('is') !== -1;
 											if (!isGetterMethod) {
 												continue;
 											}
-											variableName = lowerCaseFirstChar(methodIdentifier.substr(3));
+
+											var getterPrefixLength = methodIdentifier.indexOf('get') !== -1 ? 3 : 2;
+											variableName = lowerCaseFirstChar(methodIdentifier.substr(getterPrefixLength));
+											
 										} else if (isFieldDeclaration) {
 											variableName = bodyDeclaration.fragments[0].name.identifier;
 										} else {
