@@ -98,12 +98,12 @@ angular.module('matcherGeneratorForJavaApp')
 										if (isMethodDeclaration) {
 											var methodIdentifier = bodyDeclaration.name.identifier;
 											
-											var isGetterMethod = methodIdentifier.indexOf('get') !== -1 || methodIdentifier.indexOf('is') !== -1;
+											var isGetterMethod = methodIdentifier.indexOf('get') === 0 || methodIdentifier.indexOf('is') === 0;
 											if (!isGetterMethod) {
 												continue;
 											}
 
-											var getterPrefixLength = methodIdentifier.indexOf('get') !== -1 ? 3 : 2;
+											var getterPrefixLength = methodIdentifier.indexOf('get') === 0 ? 3 : 2;
 											variableName = lowerCaseFirstChar(methodIdentifier.substr(getterPrefixLength));
 											
 											var isPrimitiveType = bodyDeclaration.returnType2.primitiveTypeCode !== undefined;
@@ -167,12 +167,12 @@ angular.module('matcherGeneratorForJavaApp')
 										if (isMethodDeclaration) {
 											var methodIdentifier = bodyDeclaration.name.identifier;
 											
-											var isGetterMethod = methodIdentifier.indexOf('get') !== -1 || methodIdentifier.indexOf('is') !== -1;
+											var isGetterMethod = methodIdentifier.indexOf('get') === 0 || methodIdentifier.indexOf('is') === 0;
 											if (!isGetterMethod) {
 												continue;
 											}
 
-											var getterPrefixLength = methodIdentifier.indexOf('get') !== -1 ? 3 : 2;
+											var getterPrefixLength = methodIdentifier.indexOf('get') === 0 ? 3 : 2;
 											variableName = lowerCaseFirstChar(methodIdentifier.substr(getterPrefixLength));
 											
 											var isPrimitiveType = bodyDeclaration.returnType2.primitiveTypeCode !== undefined;
@@ -245,12 +245,12 @@ angular.module('matcherGeneratorForJavaApp')
 										if (isMethodDeclaration) {
 											methodIdentifier = bodyDeclaration.name.identifier;
 											
-											var isGetterMethod = methodIdentifier.indexOf('get') !== -1 || methodIdentifier.indexOf('is') !== -1;
+											var isGetterMethod = methodIdentifier.indexOf('get') === 0 || methodIdentifier.indexOf('is') === 0;
 											if (!isGetterMethod) {
 												continue;
 											}
 
-											var getterPrefixLength = methodIdentifier.indexOf('get') !== -1 ? 3 : 2;
+											var getterPrefixLength = methodIdentifier.indexOf('get') === 0 ? 3 : 2;
 											variableName = lowerCaseFirstChar(methodIdentifier.substr(getterPrefixLength));
 											
 											methodIdentifier = bodyDeclaration.name.identifier + '()';
@@ -304,15 +304,20 @@ angular.module('matcherGeneratorForJavaApp')
 										if (isMethodDeclaration) {
 											var methodIdentifier = bodyDeclaration.name.identifier;
 											
-											var isGetterMethod = methodIdentifier.indexOf('get') !== -1 || methodIdentifier.indexOf('is') !== -1;
+											var isGetterMethod = methodIdentifier.indexOf('get') === 0 || methodIdentifier.indexOf('is') === 0;
 											if (!isGetterMethod) {
 												continue;
 											}
 
-											var getterPrefixLength = methodIdentifier.indexOf('get') !== -1 ? 3 : 2;
+											var getterPrefixLength = methodIdentifier.indexOf('get') === 0 ? 3 : 2;
 											variableName = lowerCaseFirstChar(methodIdentifier.substr(getterPrefixLength));
 											
 										} else if (isFieldDeclaration) {
+											var isPublicField = bodyDeclaration.modifiers[0].keyword === 'public';
+											if (!isPublicField) {
+												continue;
+											}
+											
 											variableName = bodyDeclaration.fragments[0].name.identifier;
 										} else {
 											continue;
