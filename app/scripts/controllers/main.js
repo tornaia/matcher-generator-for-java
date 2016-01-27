@@ -166,7 +166,8 @@ angular.module('matcherGeneratorForJavaApp')
 										var variableName;
 										var matcherClass;
 										var matcherMethod = 'is';
-										var isBoxedPrimitiveType =  isFieldDeclaration && bodyDeclaration.type.node !== 'PrimitiveType' && bodyDeclaration.type.node !== 'ParameterizedType' && isBoxedPrimitive(bodyDeclaration.type.name.identifier) || isMethodDeclaration && bodyDeclaration.returnType2.node !== 'PrimitiveType' && bodyDeclaration.returnType2.node !== 'ParameterizedType' && isBoxedPrimitive(bodyDeclaration.returnType2.name.identifier);
+										var isPrimitiveType = isFieldDeclaration && bodyDeclaration.type.node === 'PrimitiveType' || isMethodDeclaration && !bodyDeclaration.constructor && bodyDeclaration.returnType2.node === 'PrimitiveType';
+										var isBoxedPrimitiveType = !isPrimitiveType && (isFieldDeclaration && bodyDeclaration.type.node !== 'PrimitiveType' && bodyDeclaration.type.node !== 'ParameterizedType' && isBoxedPrimitive(bodyDeclaration.type.name.identifier) || isMethodDeclaration && !bodyDeclaration.constructor && bodyDeclaration.returnType2.node !== 'PrimitiveType' && bodyDeclaration.returnType2.node !== 'ParameterizedType' && isBoxedPrimitive(bodyDeclaration.returnType2.name.identifier));
 
 										if (isMethodDeclaration) {
 											var methodIdentifier = bodyDeclaration.name.identifier;
@@ -186,7 +187,7 @@ angular.module('matcherGeneratorForJavaApp')
 											} else if (isParametrized) {
 												matcherClass = bodyDeclaration.returnType2.type.name.identifier + '<' + bodyDeclaration.returnType2.typeArguments[0].name.identifier + '>';
 											} else if (isBoxedPrimitiveType) {
-												matcherClass = bodyDeclaration.type.name.identifier;
+												matcherClass = bodyDeclaration.returnType2.name.identifier;
 											} else {
 												matcherClass = 'Matcher<' + bodyDeclaration.returnType2.name.identifier + '>';
 											}
@@ -218,7 +219,7 @@ angular.module('matcherGeneratorForJavaApp')
 											continue;
 										}
 
-										var howToAssignToThisVariable = isBoxedPrimitiveType ? matcherMethod + '(' + variableName + ')' : variableName;
+										var howToAssignToThisVariable = isPrimitiveType || isBoxedPrimitiveType ? matcherMethod + '(' + variableName + ')' : variableName;
 
 										fields += TAB + 'public ' + builderReturnType + 'Matcher ' + variableName + '(' + matcherClass + ' ' + variableName + ') {\n' + TAB + TAB + 'this.' + variableName + ' = ' + howToAssignToThisVariable + ';\n' + TAB + TAB + 'return this;\n' + TAB + '}\n\n';
 									}
