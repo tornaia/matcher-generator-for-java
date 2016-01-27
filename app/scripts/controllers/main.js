@@ -322,6 +322,11 @@ angular.module('matcherGeneratorForJavaApp')
 											variableName = lowerCaseFirstChar(methodIdentifier.substr(getterPrefixLength));
 
 										} else if (isFieldDeclaration) {
+											var isPublicField = bodyDeclaration.modifiers[0].keyword === 'public';
+											if (!isPublicField) {
+												continue;
+											}
+
 											variableName = bodyDeclaration.fragments[0].name.identifier;
 										} else {
 											continue;
