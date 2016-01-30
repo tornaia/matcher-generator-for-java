@@ -73,14 +73,14 @@ angular.module('matcherGeneratorForJavaApp')
 
 			import hu.ipsystems.matcher.KipTypeSafeDiagnosingMatcher;
 		*/
-		var sectionImports = 'import static org.hamcrest.Matchers.contains;\nimport static org.hamcrest.Matchers.is;\n\nimport org.hamcrest.Description;\nimport org.hamcrest.Matcher;\nimport org.hamcrest.core.IsAnything;\n\nimport hu.ipsystems.matcher.KipTypeSafeDiagnosingMatcher;';
+		var sectionImports = 'import static org.hamcrest.Matchers.contains;\nimport static org.hamcrest.Matchers.is;\n\nimport org.hamcrest.Description;\nimport org.hamcrest.Matcher;\nimport org.hamcrest.TypeSafeDiagnosingMatcher;\nimport org.hamcrest.core.IsAnything;';
 
 		/*
-			public class HelloWorldMatcher extends KipTypeSafeDiagnosingMatcher<HelloWorld> {
+			public class HelloWorldMatcher extends TypeSafeDiagnosingMatcher<HelloWorld> { {
 		*/
 		var sectionClassSignatureOpen = (function () {
 									var baseClassName = classAsJson.types[0].name.identifier;
-									return 'public class ' + baseClassName + 'Matcher extends KipTypeSafeDiagnosingMatcher<' + baseClassName + '> {';
+									return 'public class ' + baseClassName + 'Matcher extends TypeSafeDiagnosingMatcher<' + baseClassName + '> {';
 								})();
 
 
@@ -344,10 +344,14 @@ angular.module('matcherGeneratorForJavaApp')
 									return describeToPrefix + describeToBody + describeToPostFix;
 								})();
 
+      var sectionMatchesMethod = (function () {
+        return '\n' + TAB + 'protected <X> boolean matches(Matcher<? extends X> matcher, X value, String attribute, Description mismatchDescription) {\n' + TAB + TAB + 'if (!matcher.matches(value)) {\n' + TAB + TAB + TAB + 'mismatchDescription.appendText(" " + attribute + " ");\n' + TAB + TAB + TAB + 'matcher.describeMismatch(value, mismatchDescription);\n' + TAB + TAB + TAB + 'return false;\n' + TAB + TAB + '} else {\n' + TAB + TAB + TAB + 'return true;\n' + TAB + TAB + '}\n' + TAB + '}';
+      })();
+
 		var sectionClassSignatureClose = (function () {
 									return '}';
 								})();
 
-		$scope.resultText = sectionPackage + '\n\n' + sectionImports + '\n\n' + sectionClassSignatureOpen + '\n\n' + sectionFields + sectionBuilderMethods + sectionMatchesSafely + '\n\n' + sectionDescribeTo +  '\n' + sectionClassSignatureClose;
+		$scope.resultText = sectionPackage + '\n\n' + sectionImports + '\n\n' + sectionClassSignatureOpen + '\n\n' + sectionFields + sectionBuilderMethods + sectionMatchesSafely + '\n\n' + sectionDescribeTo +  '\n' + sectionMatchesMethod + '\n' + sectionClassSignatureClose;
 	};
   }]);
